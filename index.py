@@ -1,5 +1,6 @@
 import pdfplumber
 import pdfminer
+import math
 
 laparams = {
     "char_margin":2.0,
@@ -9,23 +10,25 @@ laparams = {
     "detect_vertical":True
 } 
 
-pdf_content = ""
+detailed_content = ""
+raw_content = ""
 
 with pdfplumber.open("./WB/teste.pdf",laparams=laparams) as pdf:
+    for p in pdf.pages:
+        raw_content += "\n".join([x['text'] for x in p.extract_words(keep_blank_chars=True, use_text_flow=True, x_tolerance=6)])
+        raw_content += "\n\n"
+        detailed_content += "\n".join([f"{x['text']} [x:{str(x['x0'])},y:{str(round(x['doctop'], 2))}]" for x in p.extract_words(keep_blank_chars=True, use_text_flow=True, x_tolerance=6)])
+        detailed_content += "\n<-------------- FIM DA PÁGINA ------------->\n\n"
+        # dict_content = {math.floor(x["x0"]):"" for x in p.extract_words(keep_blank_chars=True, use_text_flow=True, x_tolerance=6)}
+        # print(dict_content)
     # print([x for x in range(len(pdf.pages[0].extract_words())) if "labo-" in pdf.pages[0].extract_words()[x]["text"] ])
     # print([x for x in pdf.pages[0].extract_words() if "labo-" in x["text"]])
     # print(pdf.pages[0].extract_words()[240])
     # print(pdf.pages[0].height)
     # print(pdf.pages[0].within_bbox((0,0, 0.5*pdf.pages[0].width, pdf.pages[0].height)).extract_text())
-    for p in pdf.pages:
-        pdf_content += "\n".join([f"{x['text']} [x:{str(x['x0'])},y:{str(round(x['doctop'], 2))}]" for x in p.extract_words(keep_blank_chars=True, use_text_flow=True, x_tolerance=6)])
-        pdf_content += "\n<-------------- FIM DA PÁGINA ------------->\n\n"
 
-with open("output.txt", "w", encoding="utf-8") as f:
-    f.write(pdf_content)
+with open("commented_text.txt", "w", encoding="utf-8") as f:
+    f.write(detailed_content)
         
-    
-# with pdfplumber.open("teste1.pdf", laparams=laparams) as pdf:
-# print(pdf.pages[0].within_bbox())
-# for page in pdf.pages:
-#     print(page.extract_text())
+with open("raw_text.txt", "w", encoding="utf-8") as f:
+    f.write(raw_content)
