@@ -6,7 +6,7 @@ laparams = {
     "char_margin":2.0,
     "line_margin":0.5,
     "word_margin":0.1,
-    "boxes_flow":0,
+    "boxes_flow":1.0,
     "detect_vertical":True
 } 
 
